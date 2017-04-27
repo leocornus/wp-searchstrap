@@ -1,3 +1,8 @@
+MOVED!
+======
+
+!!!ALL DEVELOPMENT WORK MOVED TO PLUGIN wp-search-toolkit (https://github.com/leocornus/wp-search-toolkit)!!!
+
 wp-searchstrap
 ==============
 
