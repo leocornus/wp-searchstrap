@@ -2,6 +2,11 @@
 
 /**
  * PHP function for advanced search.
+ *
+ * shortcode could be used in following format:
+ *
+ *  - [advanced-search]
+ *  - [advanced-search key='abc']
  */
 function searchstrap_advanced_search_func( $atts, $content=null ){
 

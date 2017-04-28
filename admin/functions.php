@@ -29,6 +29,7 @@ EOT;
     } else {
 
         // TODO: get the options for the key.
+        // we whill get the options from database.
         $options = get_option('searchstrap_options');
     }
 
