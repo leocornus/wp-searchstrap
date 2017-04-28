@@ -15,20 +15,21 @@ function searchstrap_get_advances_options($key) {
 
         // return default options.
         $options = <<<EOT
-        itemsPerPage: 16,
-        // we don't need search button here.
-        fq: 'site: wiki AND keywords: Acronyms',
-        //fq: 'keywords: "User Profile"',
-        //searchButton: 'sizing-addon',
-        facet: {
-            facetField: ['authors']
-        },
-        resultTemplate: buildAcronymsList,
-        autoReload: true
+itemsPerPage: 16,
+// we don't need search button here.
+fq: 'site: wiki AND keywords: Acronyms',
+//fq: 'keywords: "User Profile"',
+//searchButton: 'sizing-addon',
+facet: {
+    facetField: ['authors']
+},
+resultTemplate: buildAcronymsList,
+autoReload: true,
 EOT;
     } else {
 
         // TODO: get the options for the key.
+        $options = get_option('searchstrap_options');
     }
 
     return $options;
