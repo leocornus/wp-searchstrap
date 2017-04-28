@@ -18,4 +18,3 @@ define('SEARCHSTRAP_PLUGIN_PATH',
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/resources/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/admin/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/shortcodes/index.php');
-require_once(SEARCHSTRAP_PLUGIN_PATH . '/templates/index.php');
