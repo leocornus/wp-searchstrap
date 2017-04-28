@@ -266,7 +266,7 @@
 
             var self = this;
             // log the data for debuging...
-            console.log(data);
+            //console.log(data);
 
             var currentQuery = data.currentQuery;
             // TODO: analyze the search result.
