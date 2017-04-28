@@ -15,6 +15,7 @@ define('SEARCHSTRAP_PLUGIN_FILE', $searchstrap_file);
 define('SEARCHSTRAP_PLUGIN_PATH', 
        WP_PLUGIN_DIR.'/'.basename(dirname($searchstrap_file)));
 
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/resources/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/admin/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/shortcodes/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/templates/index.php');

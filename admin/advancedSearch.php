@@ -60,7 +60,7 @@ if($input_id === false) {
 ?>
 
 <div class="wrap">
-  <h2>Search Toolkit - LiveSearch Settings</h2>
+  <h2>SearchStrap - LiveSearch Settings</h2>
   <p>General settings for live searchb box.</p>
 
   <form name="livesearch_settings_form" method="post">
