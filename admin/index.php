@@ -1,4 +1,7 @@
 <?php
+// load utilities functions.
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/admin/functions.php');
+
 /**
  * manage site admin dashboard settings pages.
  */

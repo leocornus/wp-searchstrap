@@ -5,6 +5,24 @@
  */
 function searchstrap_advanced_search_func( $atts, $content=null ){
 
+    // TODO: v2.0 will allow user to config the search url.
+    // the default search url is a AJAX callback.
+    $search_url = 
+        '/wp-admin/admin-ajax.php?callback=?&action=advanced_search';
+
+    $normalized_array = shortcode_atts(
+        array(
+            //Default attributes - Key and values stores in an array
+            'key' => '', // default key is empty string 
+        ),
+        $atts );
+
+    // extract the parameters from user input.
+    extract( $normalized_array );
+
+    // get the options for the given key.
+    $options = searchstrap_get_advances_options($key);
+
     $ret = <<<EOT
 <!-- Search bar -->
   <div class="row" id="search-bar">
@@ -40,19 +58,9 @@ Loading
 jQuery(document).ready(function($) {
 
     $('#search-input').searchStrap({
-        searchUrl:
-'/wp-admin/admin-ajax.php?callback=?&action=advanced_search',
-        itemsPerPage: 16,
-        // we don't need search button here.
-        fq: 'site: wiki AND keywords: Acronyms',
-        //fq: 'keywords: "User Profile"',
-        //searchButton: 'sizing-addon',
-        facet: {
-            facetField: ['authors']
-        },
+        searchUrl: '{$search_url}',
         resultSelector: '#result-list',
-        resultTemplate: buildAcronymsList,
-        autoReload: false
+        {$options}
     });
 });
 
