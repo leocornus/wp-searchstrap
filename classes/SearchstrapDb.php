@@ -26,11 +26,12 @@ class SearchstrapDb {
         $sql = "CREATE TABLE $this->tn_advanced_options (
               wpss_id mediumint(9) NOT NULL AUTO_INCREMENT,
               wpss_key varchar(128) NOT NULL DEFAULT '',
-              wpss_option varchar(2048) NOT NULL DEFAULT '',
+              wpss_option varchar(4096) NOT NULL DEFAULT '',
               PRIMARY KEY (wpss_id),
               UNIQUE KEY wpss_key (wpss_key)
             );";
-        doDelta($sql);
+
+        $wpdb->query($sql);
     }
 
     /**

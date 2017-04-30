@@ -15,6 +15,21 @@ define('SEARCHSTRAP_PLUGIN_FILE', $searchstrap_file);
 define('SEARCHSTRAP_PLUGIN_PATH', 
        WP_PLUGIN_DIR.'/'.basename(dirname($searchstrap_file)));
 
+// dbDelta function is in this file.
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/classes/SearchstrapDb.php');
+
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/resources/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/admin/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/shortcodes/index.php');
+
+/**
+ * create tablses where install the plugin
+ */
+function searchstrap_install() {
+
+    $ssdb = new SearchstrapDb();
+    $ssdb->create_tables();
+}
+// the activation hook.
+register_activation_hook(SEARCHSTRAP_PLUGIN_PATH . '/' . basename(__FILE__),
+                         'searchstrap_install');
