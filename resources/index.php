@@ -16,6 +16,8 @@ function register_searchstrap_resources() {
     // searchstrap JavaScript library
     wp_register_script('wp-searchstrap',
         plugins_url("{$resources_folder}/searchstrap.js"),
+        // using this for development testing.
+        //'https://rawgit.com/leocornus/searchstrap.js/master/src/searchstrap.js',
         array(),
         '0.1.0', true);
 
