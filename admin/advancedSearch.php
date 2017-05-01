@@ -13,15 +13,14 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
     $_POST['searchstrap_settings_form_submit'] == 'Y') {
 
     $action = $_POST['action'];
+    $ssdb = new SearchstrapDb();
+
     switch($action) {
     case $label_save_action:
-        // save settings submit. save user input to database.
-        update_option('searchstrap_key',
-                stripslashes($_POST['searchstrap_key']));
-        update_option('searchstrap_options',
-                stripslashes($_POST['searchstrap_options']));
-
-        $msg = 'Setting Updated Successfully!';
+        $id = $ssdb->replace_advanced_option(
+            stripslashes($_POST['searchstrap_key']),
+            stripslashes($_POST['searchstrap_options']));
+        $msg = "Setting Updated Successfully! $id";
         break;
     default:
         break;
@@ -32,19 +31,19 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
          '</strong></p></div>';
 }
 
-$options = get_option('searchstrap_options');
-if($options === false) {
-    // no options set up yet, set the default.
-    // This is a sample default filter options, based on the 
-    // solr syntax.
-    //$options = st_livesearch_default_options();
-}
-
-$key = get_option('searchstrap_key');
-if($input_id === false) {
-    // the default input id will be livesearch.
-    //$input_id = st_livesearch_default_input_id();
-}
+//$options = get_option('searchstrap_options');
+//if($options === false) {
+//    // no options set up yet, set the default.
+//    // This is a sample default filter options, based on the 
+//    // solr syntax.
+//    //$options = st_livesearch_default_options();
+//}
+//
+//$key = get_option('searchstrap_key');
+//if($input_id === false) {
+//    // the default input id will be livesearch.
+//    //$input_id = st_livesearch_default_input_id();
+//}
 ?>
 
 <div class="wrap">
@@ -83,4 +82,10 @@ if($input_id === false) {
       </tr>
     </tbody></table>
   </form>
+
+  <?php
+    echo '<h3>Available Key Options</h3>';
+    // show all active git repos in jQuery DataTables.
+    echo searchstrap_build_options_list();
+  ?>
 </div>

@@ -64,7 +64,7 @@ class SearchstrapDb {
     /**
      * add a new option or replace the existing one.
      */
-    function replcae_advanced_option($key, $option, $id=0) {
+    function replace_advanced_option($key, $option, $id=0) {
 
         global $wpdb;
 
