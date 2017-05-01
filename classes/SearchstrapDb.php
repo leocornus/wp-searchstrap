@@ -62,6 +62,8 @@ class SearchstrapDb {
 
     /**
      * add a new option or replace the existing one.
+     * if id is 0, it will create a new option.
+     *
      */
     function replace_advanced_option($key, $option, $id=0) {
 
@@ -82,5 +84,17 @@ class SearchstrapDb {
         } else {
             return -1;
         }
+    }
+
+    /**
+     * delete the options for the given key.
+     */
+    function delete_advanced_option($key) {
+
+        global $wpdb;
+        $count = $wpdb->delete($this->tn_advanced_options,
+                               array('wpss_key' => $key),
+                               array('%s'));
+        return $count;
     }
 }

@@ -44,15 +44,20 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
         // working on a existing key/option,
         // get the action.
         $action = searchstrap_get_request_param('action');
+        $ssdb = new SearchstrapDb();
         switch($action) {
             case "edit":
                 // load the selected options.
-                $ssdb = new SearchstrapDb();
                 $current_option = 
                     $ssdb->get_advanced_option($param_key);
                 break;
             case "delete":
                 // TODO: handle the delete options.
+                $count = $ssdb->delete_advanced_option($param_key);
+                // set message.
+                echo '<div class="updated"><p><strong>' .
+                     'Successfully removed ' . $count . ' options' .
+                     '</strong></p></div>';
                 break;
         }
     }
