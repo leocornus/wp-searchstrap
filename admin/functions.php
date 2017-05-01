@@ -4,6 +4,31 @@
  */
 
 /**
+ * the clean way to get a http request parameter's value.
+ */
+function searchstrap_get_request_param($param) {
+
+    // try to find the selected theme name
+    if (array_key_exists($param, $_POST)) {
+        $value = $_POST[$param];
+    } elseif (array_key_exists($param, $_GET)) {
+        $value = $_GET[$param];
+    } elseif (array_key_exists($param, $_COOKIE)) {
+        // cookie is one of the request in PHP.
+        // check manuel $_REQUEST for details.
+        $value = $_COOKIE[$param];
+    } else {
+        $value = '';
+    }
+
+    if(is_string($value)) {
+        $value = str_replace("\r\n", "\n", stripslashes($value));
+    }
+
+    return $value;
+}
+
+/**
  * return the advanced options for the given key.
  * The key is given on advanced search setting dashboard page.
  */ 
@@ -51,9 +76,9 @@ function searchstrap_build_options_list() {
 
         $label = <<<EOT
 <strong>{$option['wpss_key']}</strong><br/>
-<a href="?page={$_REQUEST['page']}&repo={$option['wpss_key']}&action=edit">
+<a href="?page={$_REQUEST['page']}&key={$option['wpss_key']}&action=edit">
 Edit</a> | 
-<a href="?page={$_REQUEST['page']}&repo={$option['wpss_key']}&action=delete">
+<a href="?page={$_REQUEST['page']}&key={$option['wpss_key']}&action=delete">
 Delete</a> 
 EOT;
 

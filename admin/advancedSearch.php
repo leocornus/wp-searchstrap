@@ -7,11 +7,15 @@
  * we will have save and reset button for the simple admin page.
  * Define the label for those actions here.
  */
-$label_save_action = "Save Settings";
+$label_save_action = "Save Options";
+
+// current option, default is empty for create new options..
+$current_option = array();
 
 if (isset($_POST['searchstrap_settings_form_submit']) &&
     $_POST['searchstrap_settings_form_submit'] == 'Y') {
 
+    // handle form submit.
     $action = $_POST['action'];
     $ssdb = new SearchstrapDb();
 
@@ -29,6 +33,28 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
     // show the message.
     echo '<div class="updated"><p><strong>' . $msg .
          '</strong></p></div>';
+} else {
+
+    // normal page load.
+    $param_key = searchstrap_get_request_param('key');
+    if($param_key === "") {
+        // create new options.
+    } else {
+        // working on a existing key/option,
+        // get the action.
+        $action = searchstrap_get_request_param('action');
+        switch($action) {
+            case "edit":
+                // load the selected options.
+                $ssdb = new SearchstrapDb();
+                $current_option = 
+                    $ssdb->get_advanced_option($param_key);
+                break;
+            case "delete":
+                // TODO: handle the delete options.
+                break;
+        }
+    }
 }
 
 //$options = get_option('searchstrap_options');
@@ -58,7 +84,7 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
         <th scope="row">Advanced Search Key:</th>
         <td>
           <input name="searchstrap_key" size="80"
-                 value="<?php echo $key;?>"
+                 value="<?php echo $param_key;?>"
           >
         </td>
       </tr>
@@ -69,7 +95,7 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
         <td>
           <textarea name="searchstrap_options"
                     rows="6" cols="98"
-          ><?php echo $options;?></textarea>
+          ><?php echo $current_option['wpss_option'];?></textarea>
         </td>
       </tr>
       <tr>
