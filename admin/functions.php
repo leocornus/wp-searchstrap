@@ -29,8 +29,10 @@ EOT;
     } else {
 
         // TODO: get the options for the key.
+        $ssdb = new SearchstrapDb();
+        $options = $ssdb->get_advanced_option($key);
         // we whill get the options from database.
-        $options = get_option('searchstrap_options');
+        $options = $options['wpss_option'];
     }
 
     return $options;

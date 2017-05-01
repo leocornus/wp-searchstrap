@@ -53,10 +53,9 @@ class SearchstrapDb {
     function get_advanced_option($key) {
     
         global $wpdb;
-        $query = "SELECT * FROM $this->tn_advanced_options 
-            WHERE wpss_key = %s";
+        $query = "SELECT * FROM $this->tn_advanced_options WHERE wpss_key = %s";
         $query = $wpdb->prepare($query, $key);
-        $option = $wpdb->getRow($query, ARRAY_A);
+        $option = $wpdb->get_row($query, ARRAY_A);
 
         return $option;
     }
