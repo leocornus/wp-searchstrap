@@ -25,7 +25,7 @@ if (isset($_POST['searchstrap_settings_form_submit']) &&
             stripslashes($_POST['searchstrap_key']),
             stripslashes($_POST['searchstrap_options']),
             (int) $_POST['searchstrap_id']);
-        $msg = "Setting Updated Successfully! $id";
+        $msg = "Successfully updated option with id: $id!";
         break;
     default:
         break;
