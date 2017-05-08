@@ -56,7 +56,6 @@ jQuery(document).ready(function($) {
         {$options}
     });
 });
-
 </script>
 EOT;
 

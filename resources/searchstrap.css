@@ -1,0 +1,21 @@
+/**
+ * This stylesheet try to provide a quick memo for the 
+ * necessary styles required for the searchstrap.
+ * Sometime it is just a reminder for some style tricks.
+ */
+
+/**
+ * To make the Bootstrap input clear button works fine,
+ * we need:
+ *  - disable the default Microsoft clear icon.
+ *  - tweak the z-inde for the form-control-clear class.
+ */
+::-ms-clear {
+  display: none;
+}
+
+.form-control-clear {
+  z-index: 10;
+  pointer-events: auto;
+  cursor: pointer;
+}
