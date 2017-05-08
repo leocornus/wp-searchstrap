@@ -35,19 +35,7 @@ function searchstrap_advanced_search_func( $atts, $content=null ){
     </div>
 
     <div class="col-md-8 col-sm-8">
-      <div class="input-group input-group-lg"
-           role="group" aria-label="...">
-        <input type="text" class="form-control"
-               placeholder="Find Acronyms"
-               id="search-input"
-               aria-describedby="sizing-addon"/>
-        <span class="input-group-addon">
-          <i class="fa fa-search text-primary"></i>
-        </span>
-      </div>
-      <div class="text-muted text-center h4" id="search-info">
-        <h2>Loading...</h2>
-      </div>
+      <div id="searchstrap"></div>
     </div>
 
     <div class="col-md-2 col-sm-2">
@@ -62,7 +50,7 @@ Loading
 <script type="text/javascript">
 jQuery(document).ready(function($) {
 
-    $('#search-input').searchStrap({
+    $('#searchstrap').searchStrap({
         searchUrl: '{$search_url}',
         resultSelector: '#result-list',
         {$options}

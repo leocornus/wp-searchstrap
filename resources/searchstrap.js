@@ -1,14 +1,15 @@
 /**
  * jQuery plugin to present a simple search function.
  *
- *   jQuery('#searn-input-id').searchStrap();
+ *   jQuery('#div-id').searchStrap();
  */
 
 ;(function($) {
 
     // plugin name and default values.
     var pluginSearchStrap = "searchStrap";
-    // set the default values
+
+    // set the default values / options.
     var defaults = {
         // the url endpoint for search.
         searchUrl : '/search',
@@ -31,6 +32,11 @@
         // for example: "site: wiki AND keywords: Acronyms"
         // default is empty
         fq: '',
+
+        /**
+         * set the default sort.
+         */
+        sort: 'lastModifiedDate desc',
 
         // jQuery selector for the the search result section.
         resultSelector: '#search-result',
@@ -76,6 +82,21 @@
         this.init();
     }
 
+    // add the plugin to the jQuery chain.
+    $.fn[pluginSearchStrap] = function(options) {
+
+        // return to maintain the chain.
+        return this.each(function() {
+            // check the local storage index for the current
+            // element.
+            if(!$.data(this, "plugin_" + pluginSearchStrap)) {
+                // no plugin created yet, let create a new one.
+                $.data(this, "plugin_" + pluginSearchStrap, 
+                       new Plugin(this, options));
+            }
+        });
+    };
+
     // use extend method to avoid Plugin prototype confilcts.
     $.extend(Plugin.prototype, {
 
@@ -84,21 +105,28 @@
 
             var self = this;
 
+            // build the search box.
+            var searchBox = self.buildSearchBox();
+
             // we will get search term from query
+            // TODO: more are comming, facets, sort, etc.
             var paramName = self.settings.queryName;
             var queryParams = self.getUrlVars();
 
+            // handle search term.
             // set to empty string if no query parameter found.
             var searchTerm = paramName in queryParams ?
                              queryParams[paramName] : '';
             searchTerm = decodeURIComponent(searchTerm);
             // set the initial value for input box
-            this.$element.val(searchTerm);
+            self.$inputBox.val(searchTerm);
+            // show the glyphicon remove.
+            self.toggleRemoveIcon();
             // trigger the propertychange event. 
             // some function depends on this event.
             // e.g., the clear button using Bootstrap feedback icon
             // will depen on this event.
-            this.$element.trigger('propertychange');
+            this.$inputBox.trigger('propertychange');
 
             // set the start to 1 if we could not find it.
             var start = 'start' in queryParams ?
@@ -107,6 +135,7 @@
             // prepare the query to perform the initial search
             var searchQuery =
                 this.prepareSearchQuery(searchTerm, start);
+            // the initial search.
             self.search(searchQuery);
 
             // hook the click event to search button.
@@ -118,7 +147,7 @@
             });
 
             // hook the key press event.
-            this.$element.on('keypress', function(event) {
+            self.$inputBox.on('keypress', function(event) {
 
                 //console.log(event);
                 // only handle the enter key.
@@ -127,10 +156,12 @@
                 }
             });
 
-            if(self.settings.autoReload) {
-                // hook the key up event for the input field.
-                self.$element.on('keyup', function(event) {
+            // hook the key up event for the input field.
+            self.$inputBox.on('keyup', function(event) {
 
+                self.toggleRemoveIcon();
+
+                if(self.settings.autoReload) {
                     var term = $(this).val();
                     if (term.length >= 0) {
                         // prepare the query to perform 
@@ -138,8 +169,8 @@
                         var query = self.prepareSearchQuery(term, 1);
                         self.search(query);
                     }
-                });
-            }
+                }
+            });
         },
 
         /**
@@ -200,6 +231,7 @@
                 term: searchQuery.term,
                 start: searchQuery.start,
                 perPage: self.settings.itemsPerPage,
+                sort: self.settings.sort,
                 // facet
                 facet: JSON.stringify(self.settings.facet),
                 fq: self.settings.fq
@@ -223,11 +255,12 @@
          */
         handleButtonClick : function() {
 
-            var term = this.$element.val();
+            var term = this.$inputBox.val();
             // prepare the query to perform the initial search
             // this is a new search, reset start to 1
             var query = this.prepareSearchQuery(term, 1);
-            this.search(query);
+            // no need search again if we will reload the page.
+            //this.search(query);
 
             // update the brwoser url to
             // reflect the search input field
@@ -241,10 +274,17 @@
 
             var reload =
                 typeof reload === 'undefined' ? false : true;
-            // build the new url.
-            url = '?' + this.settings.queryName + 
-                  '=' + encodeURIComponent(searchQuery.term) +
-                  '&start=' + searchQuery.start;
+            // Check first, if the query term is empty,
+            // we don't need the query parameter!
+            // build the search term parameter.
+            var query = [];
+            if(searchQuery.term.length > 0) {
+                query.push(this.settings.queryName +
+                    '=' + encodeURIComponent(searchQuery.term));
+            }
+            // add the start parameter.
+            query.push('start=' + searchQuery.start);
+            var url = '?' + query.join('&');
 
             // the push state will keep the url in history,
             // so the back will remember it.
@@ -266,7 +306,7 @@
 
             var self = this;
             // log the data for debuging...
-            //console.log(data);
+            console.log(data);
 
             var currentQuery = data.currentQuery;
             // TODO: analyze the search result.
@@ -309,6 +349,69 @@
                                       currentPage, totalPages, 
                                       perPage);
             });
+        },
+
+        /**
+         * the default builder to build search input box
+         * this will depend on Bootstap
+         */
+        buildSearchBox: function() {
+
+            var self = this;
+
+            var searchBox = 
+'<div class="input-group input-group-lg"' +
+'     role="group" aria-label="...">' +
+'  <div class="form-group form-group-lg has-feedback has-clear">' +
+'    <input type="text" class="form-control"' +
+'           placeholder="Find Acronyms"' +
+'           id="search-input"' +
+'           aria-describedby="sizing-addon"/>' +
+'    <span class="form-control-clear text-danger' +
+'                 glyphicon glyphicon-remove' +
+'                 form-control-feedback hidden"></span>' +
+'  </div>' +
+'  <span class="input-group-addon" id="search-button"' +
+'        style="cursor: pointer">' +
+'    <span class="glyphicon glyphicon-search ' +
+'                 text-primary"></span> Search' +
+'  </span>' +
+'</div>' +
+// the infor bar.
+'<div class="text-muted h4" id="search-info">' +
+'  <h2>Loading...</h2>' +
+'</div>';
+
+            self.$element.html('').append(searchBox);
+            self.$inputBox = self.$element.find('input');
+
+            // hook the clik event on the remove icon.
+            self.$element.find('.glyphicon-remove')
+                .on('click', function(event) {
+
+                self.$inputBox.val('');
+                // hide the remove icon.
+                $(this).addClass('hidden');
+                // reload page.
+                self.handleButtonClick();
+            });
+        },
+
+        /**
+         * toggle remove icon.
+         */
+        toggleRemoveIcon: function() {
+
+            var self = this;
+
+            if(self.$inputBox.val()) {
+                // show the glyphicon remove.
+                self.$element.find('.glyphicon-remove').
+                     removeClass('hidden');
+            } else {
+                self.$element.find('.glyphicon-remove').
+                     addClass('hidden');
+            }
         },
 
         /**
@@ -852,19 +955,5 @@
             this.updateBrowserUrl(query);
         }
     });
-
-    $.fn[pluginSearchStrap] = function(options) {
-
-        // return to maintain the chain.
-        return this.each(function() {
-            // check the local storage index for the current
-            // element.
-            if(!$.data(this, "plugin_" + pluginSearchStrap)) {
-                // no plugin created yet, let create a new one.
-                $.data(this, "plugin_" + pluginSearchStrap, 
-                       new Plugin(this, options));
-            }
-        });
-    };
 
 })(jQuery);
