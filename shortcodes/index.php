@@ -11,6 +11,7 @@ function load_searchstrap_resources() {
     // enqueue the searchstrap.js
     wp_enqueue_script('wp-searchstrap');
     wp_enqueue_style('wp-searchstrap-css');
+    wp_enqueue_script('wp-searchstrap-moment');
     wp_enqueue_script('wp-searchstrap-default');
 }
 

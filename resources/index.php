@@ -35,5 +35,5 @@ function register_searchstrap_resources() {
     wp_register_script('wp-searchstrap-default',
         plugins_url("{$resources_folder}/templates/defaultTemplates.js"),
         array(),
-        '0.1.0', true);
+        '0.1.2', true);
 }
