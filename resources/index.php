@@ -13,6 +13,11 @@ function register_searchstrap_resources() {
     // resources folder.
     $resources_folder = 'wp-searchstrap/resources';
 
+    // the moment.js 
+    wp_register_script('wp-searchstrap-moment',
+        plugins_url("{$resources_folder}/moment.js"),
+        array(),
+        '2.8.1', true);
     // searchstrap JavaScript library
     wp_register_script('wp-searchstrap',
         plugins_url("{$resources_folder}/searchstrap.js"),
@@ -21,7 +26,7 @@ function register_searchstrap_resources() {
         array(),
         '0.1.6', true);
     // searchstrap stylesheet 
-    wp_register_script('wp-searchstrap-css',
+    wp_register_style('wp-searchstrap-css',
         plugins_url("{$resources_folder}/searchstrap.css"),
         array(),
         '0.1.1', 'all');
