@@ -19,7 +19,7 @@ function register_searchstrap_resources() {
         // using this for development testing.
         //'https://rawgit.com/leocornus/searchstrap.js/master/src/searchstrap.js',
         array(),
-        '0.1.1', true);
+        '0.1.6', true);
     // searchstrap stylesheet 
     wp_register_script('wp-searchstrap-css',
         plugins_url("{$resources_folder}/searchstrap.css"),
