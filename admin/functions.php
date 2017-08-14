@@ -87,7 +87,7 @@ EOT;
 <tr>
   <td>{$option['wpss_id']}</td>
   <td>{$label}</td>
-  <td><pre>{$option['wpss_option']}</pre></td>
+  <td><pre style="white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap;">{$option['wpss_option']}</pre></td>
 </tr>
 EOT;
         $rows[] = $tr;
