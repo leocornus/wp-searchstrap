@@ -276,7 +276,7 @@ function searchstrap_solr_instance() {
                 'localhost' => array(
                     'host' => '10.77.8.198',
                     'port' => 80,
-                    'path' => '/search/',
+                    'path' => '/',
                 )
             )
         );
