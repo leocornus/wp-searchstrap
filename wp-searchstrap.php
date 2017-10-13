@@ -15,6 +15,9 @@ define('SEARCHSTRAP_PLUGIN_FILE', $searchstrap_file);
 define('SEARCHSTRAP_PLUGIN_PATH', 
        WP_PLUGIN_DIR.'/'.basename(dirname($searchstrap_file)));
 
+// load the 3rd party libs.
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/libs/index.php');
+
 // dbDelta function is in this file.
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/classes/SearchstrapDb.php');
 
