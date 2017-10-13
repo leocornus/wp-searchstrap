@@ -1,7 +1,7 @@
 <?php
 
 require_once SEARCHSTRAP_PLUGIN_PATH . 
-             '/lib/Symfony/Component/ClassLoader/ClassLoader.php';
+             '/libs/Symfony/Component/ClassLoader/ClassLoader.php';
 use Symfony\Component\ClassLoader\ClassLoader;
 
 $loader = new ClassLoader();
