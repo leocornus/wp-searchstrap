@@ -26,6 +26,7 @@ require_once(SEARCHSTRAP_PLUGIN_PATH . '/classes/SearchstrapDb.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/resources/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/admin/index.php');
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/shortcodes/index.php');
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/apis/index.php');
 
 /**
  * create tablses where install the plugin
