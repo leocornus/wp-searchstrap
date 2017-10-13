@@ -13,18 +13,11 @@ function register_searchstrap_resources() {
     // resources folder.
     $resources_folder = 'wp-searchstrap/resources';
 
-    // the moment.js 
-    wp_register_script('wp-searchstrap-moment',
-        plugins_url("{$resources_folder}/moment.js"),
-        array(),
-        '2.8.1', true);
     // searchstrap JavaScript library
     wp_register_script('wp-searchstrap',
         plugins_url("{$resources_folder}/searchstrap.js"),
-        // using this for development testing.
-        //'https://rawgit.com/leocornus/searchstrap.js/master/src/searchstrap.js',
         array(),
-        '0.1.6', true);
+        '0.1.10', true);
     // searchstrap stylesheet 
     wp_register_style('wp-searchstrap-css',
         plugins_url("{$resources_folder}/searchstrap.css"),
@@ -35,5 +28,5 @@ function register_searchstrap_resources() {
     wp_register_script('wp-searchstrap-default',
         plugins_url("{$resources_folder}/templates/defaultTemplates.js"),
         array(),
-        '0.1.2', true);
+        '0.1.12', true);
 }

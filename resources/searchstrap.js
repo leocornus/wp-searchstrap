@@ -19,6 +19,8 @@
         itemsPerPage: 10,
         // query param for search term.
         queryName : 'searchterm',
+        // query param for filter query.
+        fqName : 'fq',
 
         /**
          * set the default sort.
@@ -44,10 +46,12 @@
          * the field list, a list of fields you want to get 
          * from the search engine.
          */
-        fl: 'id,title,site,url,description,content,keywords,lastModifiedDate',
+        fl: 'id,title,site,url,description,content,keywords,lastModifiedDate,creationDate',
 
         // search input builder.
-        searchBoxBuilder: null, // it will include the summary
+        searchBoxBuilder: null, // it may include the summary
+
+        // builder function for search summary
         summaryBuilder: null,
 
         // build the pagenation nav bar.
@@ -123,9 +127,10 @@
 
             var self = this;
 
-            // build the search box.
-            // TODO: make this configurable!
-            // reference Gooble search, search box will inlcue
+            // build the search box first!
+            // we will need using elements in search box for 
+            // rest of the initialization.
+            // reference Google search, search box will inlcue
             // - search input box. $searchInput
             // - search button. $searchButton
             // - search result summary $searchSummary
@@ -145,6 +150,7 @@
             searchTerm = decodeURIComponent(searchTerm);
             // set the initial value for input box
             self.$searchInput.val(searchTerm);
+
             // show the glyphicon remove.
             self.toggleRemoveIcon();
             // trigger the propertychange event. 
@@ -156,13 +162,20 @@
             // set the start to 1 if we could not find it.
             var start = 'start' in queryParams ?
                         queryParams['start'] : 1;
+
+            // TODO: handle filter query 
+            var filterQuery = self.settings.fqName in queryParams ?
+                              queryParams[self.settings.fqName] : '';
+            filterQuery = decodeURIComponent(filterQuery);
+
             // TODO: handle facets, sorting, etc.
 
             // prepare the query to perform the initial search
-            var searchQuery =
-                this.prepareSearchQuery(searchTerm, start);
+            // store the searchQuery so we could use it in various cases.
+            self.searchQuery =
+                self.prepareSearchQuery(searchTerm, start, filterQuery);
             // the initial search.
-            self.search(searchQuery);
+            self.search(self.searchQuery);
         },
 
         /**
@@ -190,14 +203,28 @@
          *
          * default start item is 1, as Solr counts from 1
          */
-        prepareSearchQuery: function(term, start) {
+        prepareSearchQuery: function(term, start, fq) {
+
+            var self = this;
 
             // set the default value to 1 for start.
             var start = typeof start !== 'undefined' ? start : 1;
 
+            // merge the filter query,
+            if (self.settings.fq === '') {
+                filterQuery = fq;
+            } else if (fq === '') {
+                filterQuery = self.settings.fq;
+            } else {
+                // filter query suppose to be AND!
+                // TODO: Do we need make the AND relationship configurable?
+                filterQuery = self.settings.fq + ' AND (' + fq + ')';
+            }
+
             var searchQuery = {
                 term: term,
-                start: start
+                start: start,
+                filterQuery: filterQuery
             };
 
             return searchQuery;
@@ -226,7 +253,7 @@
                 sort: self.settings.sort,
                 // facet
                 facet: JSON.stringify(self.settings.facet),
-                fq: self.settings.fq,
+                fq: searchQuery.filterQuery,
                 fl: self.settings.fl
             };
 
@@ -248,16 +275,24 @@
          */
         handleButtonClick : function() {
 
-            var term = this.$searchInput.val();
+            var self = this;
+
+            var term = self.$searchInput.val();
             // prepare the query to perform the initial search
-            // this is a new search, reset start to 1
-            var query = this.prepareSearchQuery(term, 1);
+            //var query = this.prepareSearchQuery(term, 1);
+            // instead of build the search query again,
+            // we just update the search term.
+            // other events might change the search query too.
+            self.searchQuery.term = term;
+            // Clicking search button will consider as start a new search.
+            // reset start to 1
+            self.searchQuery.start = 1;
             // no need search again if we will reload the page.
             //this.search(query);
 
             // update the brwoser url to
             // reflect the search input field
-            this.updateBrowserUrl(query, true);
+            self.updateBrowserUrl(self.searchQuery, true);
         },
 
         /**
@@ -265,22 +300,60 @@
          */
         updateBrowserUrl: function(searchQuery, reload) {
 
+            var self = this;
+
             var reload =
                 typeof reload === 'undefined' ? false : true;
+
+            var query = [];
+
             // Check first, if the query term is empty,
             // we don't need the query parameter!
             // build the search term parameter.
-            var query = [];
             if(searchQuery.term.length > 0) {
-                query.push(this.settings.queryName +
+                query.push(self.settings.queryName +
                     '=' + encodeURIComponent(searchQuery.term));
             }
+
+            // handle the filter query parameter.
+            if(searchQuery.filterQuery.length > 0) {
+                // get the filter query from search query.
+                var filterQuery = searchQuery.filterQuery;
+
+                // we have to check if there is a default filter query
+                // defined in the option.
+                if(self.settings.fq === '') {
+                    // -> NO default filter query:
+                    // DO NOTHING HERE! 
+                    // we could use the filter query from search query directly
+                } else if(self.settings.fq === filterQuery) {
+                    // -> the filter query is default filter.
+                    // have to set the filter query to empty.
+                    filterQuery = '';
+                } else {
+                    // -> Default filter query is defined.
+                    // we have to remove the default filter query.
+                    // Reference function prepareSearchQuery for details.
+                    var fts = filterQuery.split(self.settings.fq + ' AND (');
+                    //console.log(fts);
+                    // only handle when the pattern presents
+                    if(fts.length > 1) {
+                        // remove the last char, which is ).
+                        filterQuery = fts[1].substring(0, fts[1].length - 1);
+                    }
+                }
+                query.push(self.settings.fqName + '=' +
+                           encodeURIComponent(filterQuery));
+            }
+
             // add the start parameter.
             query.push('start=' + searchQuery.start);
+
+            // form the URL here.
             var url = '?' + query.join('&');
 
             // the push state will keep the url in history,
-            // so the back will remember it.
+            // so the back button of browser will remember it.
             if (reload) {
                 window.location.href = url;
             } else {
@@ -300,7 +373,7 @@
             var self = this;
 
             // log the data for debuging...
-            console.log(data);
+            //console.log(data);
 
             // save the current query, we need it for next page.
             var currentQuery = data.currentQuery;
@@ -329,6 +402,7 @@
             var searchSummary = 
                 self.buildSearchSummary(currentQuery, total,
                                         currentPage, totalPages);
+            //console.log(searchSummary);
             self.$searchSummary.html(searchSummary);
 
             // build the result list panel.
@@ -396,8 +470,10 @@
                     if (term.length >= 0) {
                         // prepare the query to perform 
                         // the initial search
-                        var query = self.prepareSearchQuery(term, 1);
-                        self.search(query);
+                        //var query = self.prepareSearchQuery(term, 1);
+                        self.searchQuery.term = term;
+                        self.searchQuery.start = 1;
+                        self.search(self.searchQuery);
                     }
                 }
             });
@@ -428,10 +504,21 @@
         buildSearchSummary: function(currentQuery, total, 
                                      currentPage, totalPages) {
 
-            // TODO: add the configurable logic.
-            var summary = 
-                this.defaultSearchSummary(currentQuery, total,
-                                          currentPage, totalPages);
+            var self = this;
+
+            var summary = '';
+
+            if(self.settings.summaryBuilder) {
+                //console.log(self.settings.summaryBuilder);
+                // use the customize search box 
+                summary = self.settings.summaryBuilder(self, currentQuery,
+                    total, currentPage, totalPages);
+                //console.log(summary);
+            } else {
+                // using the default search box.
+                summary = self.defaultSearchSummary(self, currentQuery, 
+                    total, currentPage, totalPages);
+            }
 
             return summary;
         },
@@ -443,11 +530,17 @@
         buildPagination: function(currentPage, totalPages) {
 
             var self = this;
+            var pagination = '';
 
-            // TODO: add configurable logic!
-            var pagination = 
-                self.defaultPaginationDots(self, 
+            if(self.settings.paginationBuilder) {
+                // use the customize pagination builder
+                pagination = self.settings.paginationBuilder(self,
                                            currentPage, totalPages);
+            } else {
+                // using the default pagination builder.
+                pagination = self.defaultPaginationDots(self, 
+                                           currentPage, totalPages);
+            }
 
             return pagination;
         },
@@ -458,21 +551,23 @@
         handlePagination: function($href, term, currentPage,
                                    totalPages, perPage) {
 
+            var self = this;
+
             var pageText = $href.text();
             var nextPage = 1;
             //console.log('page = ' + pageText);
-            if(pageText.includes('First')) {
+            if(pageText.indexOf('First') >= 0) {
                 // the first page button. do nothing using 
                 // the default, start from 1
                 nextPage = 1;
-            } else if(pageText.includes('Last')) {
+            } else if(pageText.indexOf('Last') >= 0) {
                 // last page.
                 nextPage = totalPages;
-            } else if(pageText.includes('Previous')) {
-                // previous page.
+            } else if(pageText.indexOf('«') >= 0) {
+                // previous page. &laquo;
                 nextPage = currentPage - 1;
-            } else if(pageText.includes('Next')) {
-                // the next page.
+            } else if(pageText.indexOf('»') >= 0) {
+                // the next page. &raquo;
                 nextPage = currentPage + 1;
             } else {
                 // get what user selected.
@@ -481,10 +576,12 @@
             var start = (nextPage - 1) * parseInt(perPage) + 1;
 
             // calculate start number to build search query.
-            var query = 
-                this.prepareSearchQuery(term, start);
-            this.search(query);
-            this.updateBrowserUrl(query);
+            //var query = 
+            //    this.prepareSearchQuery(term, start);
+            self.searchQuery.term = term;
+            self.searchQuery.start = start;
+            self.search(self.searchQuery);
+            self.updateBrowserUrl(self.searchQuery);
         },
 
         /**
@@ -679,20 +776,35 @@
 '  <h2>Loading...</h2>' +
 '</div>';
 
+            // replace the search box.
             strap.$element.html('').append(searchBox);
             // set up the searchInput jQuery object..
             strap.$searchInput = strap.$element.find('input');
             // set up the searchButton jQuery object
             strap.$searchButton = 
                 strap.$element.find('#search-button');
-            // set up the search summary.
+            // set up the search summary jQuery object.
             strap.$searchSummary = 
                 strap.$element.find('#search-info');
 
-            // hook the clik event on the remove icon.
+            /**
+             * hook the clik event on the remove icon.
+             * It will need the following styles to work fine on IE
+             *
+             * ::-ms-clear {
+             *   display: none;
+             * }
+             *
+             * .form-control-clear {
+             *   z-index: 10;
+             *   pointer-events: auto;
+             *   cursor: pointer;
+             * }
+             */
             strap.$element.find('.glyphicon-remove')
                 .on('click', function(event) {
 
+                // clean the search term in the input box.
                 strap.$searchInput.val('');
                 // hide the remove icon.
                 $(this).addClass('hidden');
@@ -747,8 +859,8 @@
          * build the default pagination with ... and 
          * without First and Last button.
          */
-        defaultPaginationDots: function(strap, currentPage,
-                totalPages, surroundingPages, tailingPages) {
+        defaultPaginationDots: function(strap, currentPage, totalPages,
+                    labels, surroundingPages, tailingPages) {
 
             // set default value for surrouning and tailing pages.
             var surroundingPages = 
@@ -758,6 +870,11 @@
                 typeof tailingPages !== 'undefined' ?
                 tailingPages : 2;
 
+            // set default labels, in English.
+            var labels =  typeof labels !== 'undefined' ? labels :
+                {'previous' : '&laquo; Previous',
+                 'next' : 'Next &raquo;'};
+
             var pagination = '<nav class="text-center">' +
                              '<ul class="pagination"' +
                              '    style="cursor: pointer">';
@@ -765,9 +882,9 @@
             var thePage = '';
             // decide the previous page button
             if(currentPage !== 1) {
-                thePage = this.buildAPage('&laquo; Previous');
+                thePage = this.buildAPage(labels.previous);
             } else {
-                thePage = this.buildAPage('&laquo; Previous', 'disabled');
+                thePage = this.buildAPage(labels.previous, 'disabled');
             }
             pagination = pagination + thePage;
 
@@ -843,9 +960,9 @@
 
             // decide the next page button.
             if(currentPage !== totalPages) { 
-                thePage = this.buildAPage('Next &raquo;');
+                thePage = this.buildAPage(labels.next);
             } else {
-                thePage = this.buildAPage('Next &raquo;', 'disabled');
+                thePage = this.buildAPage(labels.next, 'disabled');
             }
             pagination = pagination + thePage;
 
@@ -883,7 +1000,7 @@
         /**
          * the default search summary.
          */
-        defaultSearchSummary: function(currentQuery, total,
+        defaultSearchSummary: function(strap, currentQuery, total,
                                        currentPage, totalPages) {
             //
             var resultSummary = '';
