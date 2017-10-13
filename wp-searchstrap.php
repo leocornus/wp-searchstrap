@@ -17,6 +17,8 @@ define('SEARCHSTRAP_PLUGIN_PATH',
 
 // load the 3rd party libs.
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/libs/index.php');
+// load funtions
+require_once(SEARCHSTRAP_PLUGIN_PATH . '/functions/index.php');
 
 // dbDelta function is in this file.
 require_once(SEARCHSTRAP_PLUGIN_PATH . '/classes/SearchstrapDb.php');
