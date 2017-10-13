@@ -29,22 +29,15 @@ function searchstrap_advanced_search_func( $atts, $content=null ){
     $options = searchstrap_get_advances_options($key);
 
     $ret = <<<EOT
-<!-- Search bar -->
-  <div class="row" id="search-bar">
-    <div class="col-md-2 col-sm-2">
-    </div>
-
-    <div class="col-md-8 col-sm-8">
-      <div id="searchstrap"></div>
-    </div>
-
-    <div class="col-md-2 col-sm-2">
-    </div>
+<div class="row" id="search-bar">
+  <div class="col-md-4" style="padding-right:20px; border-right: 2px solid #ccc;">
+    <div id="searchstrap"></div>
   </div>
 
-<!-- Example row of columns -->
-<div class="" id="result-list">
-Loading
+  <div class="col-md-8">
+    <div class="text-muted h4" id="search-info"></div>
+    <div id="result-list"></div>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -57,6 +50,20 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
+<style>
+/**
+ * for the input clear button.
+ */
+::-ms-clear {
+  display: none;
+}
+
+.form-control-clear {
+  z-index: 10;
+  pointer-events: auto;
+  cursor: pointer;
+}
+</style>
 EOT;
 
     return $ret;
