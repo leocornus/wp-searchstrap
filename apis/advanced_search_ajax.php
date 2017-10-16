@@ -44,11 +44,11 @@ function solr_advanced_search_callback() {
         if(empty($fl)) {
             // TODO: this should be configurable.
             // the default field list.
-            $fl = "id,title,site,description,url,content,keywords,lastModifiedDate";
+            $fl = "id,title,description,url";
         }
     } else {
         // TODO: this should be configurable.
-        $fl = "id,title,site,description,url,content,keywords,lastModifiedDate";
+        $fl = "id,title,description,url";
     } 
 
     $start = intval($_REQUEST['start']); 
